@@ -1,13 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import multer from 'multer'
+// import multer from 'multer'
 
 const app = express()
 
 const encoding = 'image/jpeg'
-const storage = multer.memoryStorage();
-const upload = multer({storage: storage})
+// const storage = multer.memoryStorage();
+// const upload = multer({storage: storage})/
 
 app.use(cors())
 app.use(bodyParser.raw({ type: encoding, limit: "50mb" }));
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
     res.send("Hell, World!")
 })
 
-app.post('/streaming', upload.single('blobData'), (req, res) => {
+app.post('/streaming', (req, res) => {
     console.log(req)
     const buffer = req.body
     // const b = new Blob([req.body], {type: "image/jpg"})
