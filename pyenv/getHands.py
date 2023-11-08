@@ -17,7 +17,7 @@ def getHands(img):
     np.set_printoptions(suppress=True)
 
     # Load the TensorFlow Lite model
-    interpreter = tf.lite.Interpreter(model_path="./HandsOn-train-ai/proper/asl_model.tflite")
+    interpreter = tf.lite.Interpreter(model_path="./asl_model.tflite")
     interpreter.allocate_tensors()
 
     # Load the labels
