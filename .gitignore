@@ -1,1 +1,6 @@
 node_modules/
+*.jpg
+*.mp4
+base64.test.txt
+debug.txt
+out.txt

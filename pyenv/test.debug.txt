@@ -1,0 +1,5 @@
+['a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a']
+/home/jeffisteddy/Documents/school/5AHIT/ITPP/HandsOn/backend-leikauf/HandsOn-Backend/pyenv/test.debug.py:8: size=204 B, count=6, average=34 B
+
+/home/jeffisteddy/Documents/school/5AHIT/ITPP/HandsOn/backend-leikauf/HandsOn-Backend/pyenv/test.debug.py:9: size=128 B, count=1, average=128 B
+

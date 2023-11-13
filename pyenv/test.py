@@ -1,53 +1,50 @@
 import cv2
-#TODO: Check if this shit is causing a memory leak:
 from cvzone.HandTrackingModule import HandDetector
 import numpy as np
 import math
 import time
-from PIL import Image
-import json
-import base64
-from io import BytesIO
+
 import tensorflow as tf
-import tracemalloc
 
-def getHands(img):
-    with open('debug.txt', '+a') as FO:
-        FO.write("----------------------------- New Run -----------------------------\n")
-        
-    decoded_bytes = base64.b64decode(img)
-    image_array = np.frombuffer(decoded_bytes, dtype=np.uint8)
-    cap = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-    # cap = cv2.imread('a1.jpg') #id number
-    detector = HandDetector(maxHands=2) #for now single hand (data collection)
+#capture object
+cap = cv2.VideoCapture(0) #id number
+detector = HandDetector(maxHands=2) #for now single hand (data collection)
 
-    offset = 0
-    imgSize = 300
+offset = 50
+imgSize = 300
 
-    np.set_printoptions(suppress=True)
-    tracemalloc.start()
+prevKey = ord(".")
 
-    interpreter = tf.lite.Interpreter(model_path="./asl_model.tflite")
-    
-    interpreter.allocate_tensors()
-    with open('./asdf.txt', 'r') as FO:
-        class_names = FO.readlines()
-        FO.close()
+# Disable scientific notation for clarity
+np.set_printoptions(suppress=True)
 
-    # while cap.isOpened():
-    predictionBaseImg = cap.copy()
-    hands,img = detector.findHands(predictionBaseImg)
+# Load the TensorFlow Lite model
+interpreter = tf.lite.Interpreter(model_path="models/model1/asl_model.tflite")
+interpreter.allocate_tensors()
+
+# Load the labels
+class_names = open("models/model1/labels.txt", "r").readlines()
+
+print("classes: ", class_names)
+
+while True:
+    success,img = cap.read()
+    predictionBaseImg = img.copy()
+    pImg = img
+    hands,img = detector.findHands(img)
+
     if hands:
         for i, hand in enumerate(hands):
             x,y,w,h = hand['bbox'] #get the bounding box
+
             backgroundImage = np.ones((imgSize, imgSize, 3),np.uint8)*255
             predictionBackroundImage = np.ones((imgSize, imgSize, 3),np.uint8)*255
             
             croppedImage = img[y-offset:y+h+offset, x-offset:x+w+offset]
-            # print(hand['bbox'], y-offset, x+h+offset, x-offset, x+w+offset)
             croppedPredictionImage = predictionBaseImg[y-offset:y+h+offset, x-offset:x+w+offset]
             
             aspectRatio = h/w
+
             if croppedImage.size > 0:
                 newW = w
                 newH = h
@@ -88,26 +85,17 @@ def getHands(img):
 
                 # Process output
                 index = np.argmax(output_data)
-                # print(f"found: {index}")
+                print(f"found: {index}")
                 class_name = class_names[index]
                 confidence_score = output_data[0][index]
                 # (Your existing code for displaying text)
                 cv2.putText(img, f'ASL Sign: {class_name[2:-1]} ({str(np.round(confidence_score * 100))[:-2]}%)',(x, y+h+50), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255,0,255), 2)
 
+
+
                 # Print prediction and confidence score
-                # print("Class:", class_name[2:], end="")
-                # print("Confidence Score:", str(np.round(confidence_score * 100))[:-2], "%")
+                print("Class:", class_name[2:], end="")
+                print("Confidence Score:", str(np.round(confidence_score * 100))[:-2], "%")
 
-                snapshot = tracemalloc.take_snapshot()
-                stats = snapshot.statistics('lineno')
-                with open('debug.txt', '+a') as FO:
-                    for i in stats:
-                        FO.write(str(i))
-                        FO.write('\n\n')
-                return (class_name, confidence_score)
-
-    # print(hands)
-    # cv2.imshow("Image", img)
-    # cv2.imshow(cap)
-    # cv2.waitKey(0)
-
+    cv2.imshow("Image", img)
+    cv2.waitKey(1) #1ms delays
