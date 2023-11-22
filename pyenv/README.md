@@ -7,7 +7,7 @@ Guide for setting up the python virtual environment
 
 ### 1. Creating and Activating the Virtual Environment
 ```bash
-python -m venv handson_pythonenv   # Replace 'myenv' with your desired environment name
+python -m venv handson_pythonenv 
 
 # Activating the virtual environment
 # Windows
