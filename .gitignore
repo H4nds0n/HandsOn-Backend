@@ -4,3 +4,7 @@ node_modules/
 base64.test.txt
 debug.txt
 out.txt
+testing/
+.venv/
+pyenv/__pycache__/
+pyenv_old/

@@ -22,7 +22,7 @@ app.post("/streaming", async (req, res) => {
 
 
     let before = Date.now();
-    const letter = await fetch("http://localhost:5001", {
+    const letter = await fetch("http://localhost:5001/streaming", {
       method: "POST",
       headers: {
         Accept: "application/json",

@@ -10,42 +10,52 @@ import base64
 from io import BytesIO
 import tensorflow as tf
 import tracemalloc
+import gc
 
 def getHands(img):
+    gc.enable()
+    np.set_printoptions(suppress=True)
+
+    interpreter = tf.lite.Interpreter(model_path="./asl_model.tflite")
+    interpreter.allocate_tensors()
+
     with open('debug.txt', '+a') as FO:
         FO.write("----------------------------- New Run -----------------------------\n")
-        
+    
     decoded_bytes = base64.b64decode(img)
     image_array = np.frombuffer(decoded_bytes, dtype=np.uint8)
+    decoded_bytes = ""
+
     cap = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    image_array = ""
     # cap = cv2.imread('a1.jpg') #id number
     detector = HandDetector(maxHands=2) #for now single hand (data collection)
 
     offset = 0
     imgSize = 300
 
-    np.set_printoptions(suppress=True)
     tracemalloc.start()
 
-    interpreter = tf.lite.Interpreter(model_path="./asl_model.tflite")
     
-    interpreter.allocate_tensors()
-    with open('./asdf.txt', 'r') as FO:
+
+    with open('./class_names.txt', 'r') as FO:
         class_names = FO.readlines()
         FO.close()
 
     # while cap.isOpened():
-    predictionBaseImg = cap.copy()
-    hands,img = detector.findHands(predictionBaseImg)
+    hands,img = detector.findHands(cap)
     if hands:
         for i, hand in enumerate(hands):
+            print("Run")
+            with open('debug.txt', '+a') as FO:
+                FO.write('-----------------------------')
             x,y,w,h = hand['bbox'] #get the bounding box
             backgroundImage = np.ones((imgSize, imgSize, 3),np.uint8)*255
-            predictionBackroundImage = np.ones((imgSize, imgSize, 3),np.uint8)*255
+            predictionBackgroundImage = np.ones((imgSize, imgSize, 3),np.uint8)*255
             
             croppedImage = img[y-offset:y+h+offset, x-offset:x+w+offset]
             # print(hand['bbox'], y-offset, x+h+offset, x-offset, x+w+offset)
-            croppedPredictionImage = predictionBaseImg[y-offset:y+h+offset, x-offset:x+w+offset]
+            croppedPredictionImage = cap[y-offset:y+h+offset, x-offset:x+w+offset]
             
             aspectRatio = h/w
             if croppedImage.size > 0:
@@ -68,9 +78,9 @@ def getHands(img):
                 backgroundImage[hGap:newH+hGap, wGap:newW+wGap] = resizedImg
 
                 resizedPredictImg = cv2.resize(croppedPredictionImage, (newW, newH))
-                predictionBackroundImage[hGap:newH+hGap, wGap:newW+wGap] = resizedPredictImg
+                predictionBackgroundImage[hGap:newH+hGap, wGap:newW+wGap] = resizedPredictImg
                 
-                image = predictionBackroundImage.reshape(1, 300, 300, 3)
+                image = predictionBackgroundImage.reshape(1, 300, 300, 3)
 
                 # Prepare input tensor for inference
                 input_data = (image.astype(np.float32) / 255.0)  # Normalize if necessary
@@ -101,11 +111,41 @@ def getHands(img):
                 snapshot = tracemalloc.take_snapshot()
                 stats = snapshot.statistics('lineno')
                 with open('debug.txt', '+a') as FO:
-                    for i in stats:
+                    for i in stats[:10]:
                         FO.write(str(i))
                         FO.write('\n\n')
-                return (class_name, confidence_score)
+                snapshot = None
+                stats = None
+                # class_name = None
+                # confidence_score = None
+                cap = None
+                index = None
+                output_data = None
+                output_details = None
+                detector = None
+                interpreter = None
+                image = None
+                newH = None
+                newW = None
+                wGap = None
+                hGap = None
+                resizedImg = None
+                image_array = None
+                imgSize = None
+                img = None
+                image = None
+                predictionBackgroundImage = None
+                croppedPredictionImage = None
+                resizedPredictImg = None
+                input_data = None
+                input_details = None
+                aspectRatio = None
+                decoded_bytes = None
+                offset = None
+                imgSize = None
 
+                
+                return (class_name, confidence_score)
     # print(hands)
     # cv2.imshow("Image", img)
     # cv2.imshow(cap)
