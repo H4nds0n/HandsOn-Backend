@@ -11,10 +11,10 @@ python -m venv handson_pythonenv
 
 # Activating the virtual environment
 # Windows
-myenv\Scripts\activate
+handson_pythonenv\Scripts\activate
 
 # macOS and Linux
-source myenv/bin/activate
+source handson_pythonenv/bin/activate
 
 # Install the dependencies
 pip install -r requirements.txt
