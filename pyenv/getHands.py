@@ -1,5 +1,4 @@
 import cv2
-#TODO: Check if this shit is causing a memory leak:
 from cvzone.HandTrackingModule import HandDetector
 import numpy as np
 import math
@@ -34,7 +33,6 @@ class Hands():
 
 
     def getHands(self, img):
-
         #for now single hand (data collection)
 
         decoded_bytes = base64.b64decode(img)

@@ -13,16 +13,16 @@ def streaming():
     if request.method == 'POST':
         post_data = request.get_json()['img'].split(',')[-1]
         try:
-            print("Running...")
             letter, conf = hand.getHands(post_data)
+            det = True
             conf = conf.item()
-            print("Done...")
         except Exception as e:
             letter = ""
             conf = ""
+            det = False
             print(e)
         print(type(conf), type(letter))
-        res = jsonify({"letter": letter, "conf": conf})
+        res = jsonify({"letter": letter, "conf": conf, "handExists": det})
         return res
 
         
