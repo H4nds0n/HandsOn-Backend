@@ -1,6 +1,7 @@
 node_modules/
 *.jpg
 *.mp4
+*.tflite
 base64.test.txt
 debug.txt
 out.txt
@@ -8,3 +9,4 @@ testing/
 .venv/
 pyenv/__pycache__/
 pyenv_old/
+handson_pythonenv/

@@ -12,6 +12,9 @@ import tracemalloc
 
 class Hands():
     def __init__(self):
+        with open("model.cfg", "r") as FO:
+            self.imgSize = FO.read().split('=')[-1]
+        
         np.set_printoptions(suppress=True)
         with open('./class_names.txt', 'r') as FO:
             self.class_names = FO.readlines()
@@ -25,8 +28,6 @@ class Hands():
 
 
         self.offset = 0
-        self.imgSize = 300
-
         self.detector = HandDetector(maxHands=2)
     
 
@@ -49,7 +50,6 @@ class Hands():
         hands,img = self.detector.findHands(cap)
         if hands:
             for i, hand in enumerate(hands):
-                print("Run")
                 with open('debug.txt', '+a') as FO:
                     FO.write('-----------------------------')
                 x,y,w,h = hand['bbox'] #get the bounding box
@@ -83,7 +83,7 @@ class Hands():
                     resizedPredictImg = cv2.resize(croppedPredictionImage, (newW, newH))
                     predictionBackgroundImage[hGap:newH+hGap, wGap:newW+wGap] = resizedPredictImg
                     
-                    image = predictionBackgroundImage.reshape(1, 300, 300, 3)
+                    image = predictionBackgroundImage.reshape(1, self.imgSize, self.imgSize, 3)
 
                     # Prepare input tensor for inference
                     input_data = (image.astype(np.float32) / 255.0)  # Normalize if necessary
