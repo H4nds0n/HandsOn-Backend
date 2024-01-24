@@ -27,7 +27,7 @@ def streaming():
         most_common.clear()
         return res
     
-# pass img to functiton
+# pass img to function
 # if 10 img processed -> take avg conf of most common letter, if conf > 0.75 return 
 # else remove oldest img from queue, add newest to queue 
 
