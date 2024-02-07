@@ -22,6 +22,7 @@ def streaming():
             det = False
             print(e)
         print(type(conf), type(letter))
+        letter = letter.split(" ")[-1]
         res = jsonify({"letter": letter, "conf": conf, "handExists": det})
         return res
 
